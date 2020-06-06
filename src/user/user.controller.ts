@@ -12,14 +12,13 @@ export class UserController {
 
     @MessagePattern({ role: 'user', cmd: 'get' })
     getUser(data: any): Promise<User> {
-        console.log(data);
         return this.userService.findOne({ username: data.username });
     }
 
     @Post('signup')
     async createUser(@Request() req) {
         return this.userService.createUser(req.body).then().catch(err => {
-            console.log(err)
+
         })
     }
 
