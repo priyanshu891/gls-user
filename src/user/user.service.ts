@@ -4,6 +4,7 @@ import { User } from '../Model/user.entity';
 import { Repository, FindConditions, InsertResult } from 'typeorm';
 import { validate, ValidationError } from 'class-validator'
 import { UserInterface } from '../Interface/user.interface';
+import { ClassValidation } from 'src/utils/validator';
 
 type Checker = {
     validation?: boolean,
@@ -25,10 +26,10 @@ export class UserService {
     }
 
     async createUser(user: User): Promise<InsertResult | Checker> {
-        Logger.log(user)
-        const data: Checker = this.validator(user)
+        const data = new ClassValidation().validator(user)
+        console.log(data)
         try {
-            if (!data.validation) {
+            if ((await data).validation) {
                 const userEntity = this.userRepository.create(user);
                 const res = this.userRepository.insert(userEntity);
                 Logger.log('createUser - Created user');
@@ -36,7 +37,6 @@ export class UserService {
             } else {
                 return data
             }
-
         } catch (e) {
             Logger.log(e);
             throw e;
@@ -50,15 +50,11 @@ export class UserService {
             user.accesstoken = payload.headers['authorization']?.split(' ')[1]
             return user
         });
-
         return user;
     }
 
     validator(user: User): Checker {
-        const checker: Checker = {
-            validation: false,
-            error: [],
-        }
+        const checker: Checker = {}
         const validateUser = new User();
         validateUser.name = user.name
         validateUser.email = user.email
@@ -68,28 +64,29 @@ export class UserService {
         console.log(validateUser);
 
         validate(validateUser).then(errors => {
+            console.log(errors);
             if (errors.length > 0) {
                 errors.forEach(err => {
                     const errorBuilder = {
                         property: err.property,
-                        message: err.constraints.minLength || err.constraints.isEmail
+                        message: err.constraints
                     }
+
+
                     checker.error.push(errorBuilder)
                     Logger.log(errorBuilder)
-                    console.log(errors);
-
+                    checker.validation = false,
+                        checker.data = undefined
                 })
-                checker.validation = false,
-                    checker.data = undefined
+
             } else {
                 checker.validation = true,
                     checker.error = undefined
                 checker.data = validateUser
                 console.log("validation succeed");
             }
+            return
         })
-
         return checker
     }
-
 }

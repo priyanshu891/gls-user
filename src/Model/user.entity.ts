@@ -1,4 +1,4 @@
-import { IsEmail, MinLength } from 'class-validator'
+import { IsEmail, MinLength, IsNotEmpty, IsDefined } from 'class-validator'
 import { Entity, Unique, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert } from 'typeorm'
 import { UserInterface } from '../Interface/user.interface';
 import { hash } from 'bcrypt';
@@ -11,6 +11,9 @@ export class User implements UserInterface {
     id: number;
 
     @Column()
+    @MinLength(1, {
+        message: "UserName Cannot be Blank"
+    })
     username: string;
 
     @Column()
@@ -20,6 +23,12 @@ export class User implements UserInterface {
     password: string;
 
     @Column()
+    @IsNotEmpty({
+        message: "Name Cannot be Blank"
+    })
+    @IsDefined({
+        message: "Cant be null"
+    })
     name: string;
 
     @Column()
