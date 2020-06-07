@@ -18,7 +18,7 @@ export class UserController {
     @Post('signup')
     async createUser(@Request() req) {
         return this.userService.createUser(req.body).then().catch(err => {
-
+            console.log(err);
         })
     }
 

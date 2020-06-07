@@ -25,12 +25,16 @@ export class UserService {
     }
 
     async createUser(user: User): Promise<User | InsertResult | Checker> {
-        const data = new ClassValidation().validator(user)
+        console.log(user);
+        const data = await new ClassValidation().validator(user)
+        Logger.log("data")
+        Logger.log(data)
         try {
             if ((await data).validation) {
                 const userEntity = this.userRepository.create(user);
-                const res = this.userRepository.save(userEntity);
+                const res = this.userRepository.save(userEntity)
                 Logger.log('createUser - Created user');
+                console.log(res);
                 return res;
             } else {
                 return data
