@@ -47,8 +47,12 @@ export class UserService {
 
     getUserData(payload): Promise<User | UserInterface> {
         const query = payload.params
+        console.log(query);
+
         const user = this.userRepository.findOne(query).then((user: UserInterface) => {
+            console.log(user);
             user.accesstoken = payload.headers['authorization']?.split(' ')[1]
+
             return user
         });
         return user;

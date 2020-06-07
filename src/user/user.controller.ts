@@ -10,16 +10,16 @@ export class UserController {
         private readonly userService: UserService
     ) { }
 
-    @MessagePattern({ role: 'user', cmd: 'get' })
-    getUser(data: any): Promise<User> {
-        return this.userService.findOne({ username: data.username });
-    }
-
     @Post('signup')
     async createUser(@Request() req) {
         return this.userService.createUser(req.body).then().catch(err => {
             console.log(err);
         })
+    }
+
+    @MessagePattern({ role: 'user', cmd: 'get' })
+    getUser(data: any): Promise<User> {
+        return this.userService.findOne({ username: data.username });
     }
 
     @UseGuards(AuthGuard)
