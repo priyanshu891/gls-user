@@ -1,9 +1,9 @@
-import { Repository, FindConditions, InsertResult, MongoRepository } from 'typeorm';
-import { UserInterface } from '../Interface/user.interface';
-import { ClassValidation } from 'src/utils/validator';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../Model/user.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from 'src/Model/user.schema';
+import { Model } from 'mongoose';
+import { UserDto } from 'src/Model/user.dto';
+
 
 type Checker = {
     validation?: boolean,
@@ -13,44 +13,29 @@ type Checker = {
 
 @Injectable()
 export class UserService {
-
-    constructor(
-        @InjectRepository(User)
-        private readonly userRepository: MongoRepository<User> | Repository<User>,
+    constructor(@InjectModel(User.name) private userModel: Model<User>
     ) { }
 
-    findOne(query: FindConditions<User>): Promise<User> {
-        const users = this.userRepository.findOne();
-        return users
-    }
+    async createUser(newUser: UserDto): Promise<User | any> {
 
-    async createUser(user: User): Promise<User | InsertResult | Checker> {
-        console.log(user);
-        const data = await new ClassValidation().validator(user)
-        Logger.log("data")
-        Logger.log(data)
-        try {
-            if ((await data).validation) {
-                const userEntity = this.userRepository.create(user);
-                const res = this.userRepository.save(userEntity)
-                Logger.log('createUser - Created user');
-                console.log(res);
-                return res;
-            } else {
-                return data
-            }
-        } catch (e) {
-            Logger.log(e);
-            throw e;
-        }
-    }
-
-    getUserData(payload): Promise<User | UserInterface> {
-        const query = payload.params
-        const user = this.userRepository.findOne(query).then((user: UserInterface) => {
-            user.accesstoken = payload.headers['authorization']?.split(' ')[1]
+        const createdUser = await new this.userModel(newUser).save().then(user => {
             return user
+        }).catch((err) => {
+            if (err instanceof Error) {
+                console.log(err.message);
+                return err.message
+            }
         });
-        return user;
+        return createdUser
+    }
+
+    async findOne(payload): Promise<User> {
+        console.log(payload);
+        try {
+            return this.userModel.findOne(payload)
+        } catch (error) {
+            Logger.log(error)
+        }
+
     }
 }

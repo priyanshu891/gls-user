@@ -1,14 +1,14 @@
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { userSchema, User } from 'src/Model/user.schema';
 import { UserController } from './user.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UserService } from './user.service';
-import { User } from '../Model/user.entity';
 import { Module } from '@nestjs/common';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    MongooseModule.forFeature([{ name: User.name, schema: userSchema }]),
     ConfigModule,
     ClientsModule.register([{
       name: 'AUTH_CLIENT',
