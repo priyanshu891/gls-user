@@ -12,10 +12,13 @@ import { Module } from '@nestjs/common';
     ConfigModule,
     ClientsModule.register([{
       name: 'AUTH_CLIENT',
-      transport: Transport.TCP,
+      transport: Transport.RMQ,
       options: {
-        host: 'localhost',
-        port: 4000
+        urls: ['amqp://localhost:5672'],
+        queue: 'auth_queue',
+        queueOptions: {
+          durable: false
+        },
       }
     }])
   ],

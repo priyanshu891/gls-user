@@ -1,9 +1,8 @@
-import { Controller, Logger, Post, Request, UseGuards, Get } from '@nestjs/common';
+import { Controller, Post, Request, UseGuards, Get } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AuthGuard } from '../guards/auth.guard';
 import { UserService } from './user.service';
 import { User } from 'src/Model/user.schema';
-import { get } from 'http';
 
 @Controller()
 export class UserController {

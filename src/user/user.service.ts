@@ -37,7 +37,8 @@ export class UserService {
                 throw new NotAcceptableException(error)
             }
         });
-        return createdUser
+        const res = this.client.send({ role: 'auth', cmd: 'sign' }, createdUser).pipe(timeout(5000)).toPromise();
+        return res
     }
 
     async findOne(payload): Promise<User> {
