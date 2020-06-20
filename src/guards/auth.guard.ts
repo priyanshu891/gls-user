@@ -17,7 +17,6 @@ export class AuthGuard implements CanActivate {
             const pattern = { role: 'auth', cmd: 'check' };
             const data = { jwt: req.headers['authorization']?.split(' ')[1] }
             const res = await this.client.send(pattern, data).pipe(timeout(5000)).toPromise<boolean>()
-            console.log("Hello", res);
             return res;
         } catch (err) {
             return false;

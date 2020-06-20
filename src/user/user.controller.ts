@@ -1,10 +1,9 @@
 import { Controller, Logger, Post, Request, UseGuards, Get } from '@nestjs/common';
-import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
-// import { User } from '../Model/user.entity';
-
 import { AuthGuard } from '../guards/auth.guard';
+import { UserService } from './user.service';
 import { User } from 'src/Model/user.schema';
+import { get } from 'http';
 
 @Controller()
 export class UserController {
@@ -12,21 +11,18 @@ export class UserController {
         private readonly userService: UserService
     ) { }
 
+    //------------- Messages ---------------------
+
     @MessagePattern({ role: 'user', cmd: 'get' })
     getUser(data: any): Promise<User> {
-        console.log("Got Request");
-
         return this.userService.findOne({ email: data.email });
     }
 
+    //-------------- End Points ---------------------
+
     @Post('signup')
     async createUser(@Request() req) {
-        return this.userService.createUser(req.body).then().catch(err => {
-            console.log(err);
-        })
-        // return this.userService.createUser(req.body).then().catch(err => {
-        //     console.log(err);
-        // })
+        return this.userService.createUser(req.body)
     }
 
     @UseGuards(AuthGuard)
@@ -35,9 +31,8 @@ export class UserController {
         return 'Greetings authenticated user';
     }
 
-    // // @UseGuards(AuthGuard)
-    // @Get('user/:username')
-    // async getUserData(@Request() req): Promise<any> {
-    //     return this.userService.getUserData(req)
-    // }
+    @Get('check')
+    async checker(@Request() req) {
+        return this.userService.checker();
+    }
 }
